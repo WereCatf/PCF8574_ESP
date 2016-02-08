@@ -35,6 +35,7 @@ class PCF8574
     TwoWire _Wire;
     uint8_t _address;
     uint8_t _data;
+    uint8_t _pinModeMask = 255;
     int _error;
 };
 

@@ -35,6 +35,7 @@ void PCF8574::write8(uint8_t value)
 {
   _Wire.beginTransmission(_address);
   _data = value;
+  _pinModeMask = _data;
   _Wire.write(_data);
   _error = _Wire.endTransmission();
 }
@@ -47,23 +48,16 @@ uint8_t PCF8574::read(uint8_t pin)
 
 void PCF8574::write(uint8_t pin, uint8_t value)
 {
-  PCF8574::read8();
-  if (value == LOW)
-  {
-    _data &= ~(1<<pin);
-  }
-  else
-  {
-    _data |= (1<<pin);
-  }
-  PCF8574::write8(_data);
+  uint8_t _val = value & 1;
+  if(_val) _pinModeMask |= _val << pin;
+  else _pinModeMask &= ~(1 << pin);
+  PCF8574::write8(_pinModeMask);
 }
 
 void PCF8574::toggle(uint8_t pin)
 {
-  PCF8574::read8();
-  _data ^=  (1 << pin);
-  PCF8574::write8(_data);
+  _pinModeMask ^=  (1 << pin);
+  PCF8574::write8(_pinModeMask);
 }
 
 void PCF8574::shiftRight(uint8_t n)
