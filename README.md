@@ -1,6 +1,6 @@
 # PCF8574_ESP
 
-This is a simple library for using the PCF8574/PCF8574A I/O - expanders over I2C. I took the code by Rob Tillaart from http://playground.arduino.cc/Main/PCF8574Class and modified it to allow the use of I2C on non-default port and/or using a TwoWire - class you supply to it instead of the default "Wire" as defined in Wire.h
+This is a simple library for using the PCF8574/PCF8574A I/O - expanders over I2C. I took the code by Rob Tillaart from http://playground.arduino.cc/Main/PCF8574Class and modified it to allow the use of I2C on non-default pins and/or using a TwoWire - class of your own instead of the default "Wire" as defined in Wire.h.
 
 This library does not supply any special handling for using the interrupt - pin on the PCF8574, just connect the pin to a pin on your ESP, set up an interrupt-handler for it and remember to use pinMode(pin, INPUT_PULLUP) to make use of it.
 
