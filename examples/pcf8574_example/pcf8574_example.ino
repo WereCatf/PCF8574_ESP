@@ -20,8 +20,6 @@ void PCFInterrupt() {
 void setup() {
   // Most ready-made PCF8574 - modules seem to lack an internal pullup-resistor, so you have to use the ESP8266 - internal one or else it won't work
   pinMode(14, INPUT_PULLUP);
-  // Make sure all pins are defined as inputs
-  pcf8574.write8(255);
   attachInterrupt(digitalPinToInterrupt(14), PCFInterrupt, CHANGE);
 }
 
