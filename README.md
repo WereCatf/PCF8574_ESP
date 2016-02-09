@@ -17,3 +17,7 @@ void shiftRight(uint8_t n=1)
 void shiftLeft(uint8_t n=1)
 int lastError()
 ```
+
+# Mixing INPUT- and OUTPUT-pins and write8
+
+Due to the way the PCF8574 works you cannot just use read8() to read the pin-states, then change one pin and write8() the new states out because if you are using some pins as INPUT and the pin is being pulled low the moment you read8() its state you'll then be pulling the pin LOW when issuing write8() and it'll stop working as an INPUT. For this reason the library caches written values instead of relying on reading the pin-states when using write() or toggle(), and if you use write8() in your own code you need to remember to pull HIGH any pin you want to use as INPUT regardless of their current state.
