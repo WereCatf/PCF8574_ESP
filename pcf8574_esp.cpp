@@ -15,6 +15,7 @@ PCF8574::PCF8574(uint8_t address, int sda, int scl, TwoWire UseWire)
   _Wire = UseWire;
   _address = address;
   _Wire.begin(sda, scl);
+  PCF8574::write8(_pinModeMask);
 }
 
 uint8_t PCF8574::read8()
