@@ -7,13 +7,13 @@ This library does not supply any special handling for using the interrupt - pin 
 # Usage
 ```
 class initializer PCF8574(uint8_t address, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire)
-uint8_t read8()
-uint8_t read(uint8_t pin)
-uint8_t value()
-void write8(uint8_t value)
-void write(uint8_t pin, uint8_t value)
-void toggle(uint8_t pin)
-void shiftRight(uint8_t n=1)
+uint8_t read8() -- Read all 8 pins' status at once as a bitmask with a pin being HIGH if the corresponding bit is set, and vice versa.
+uint8_t read(uint8_t pin) -- Returns a single pin's status.
+uint8_t value() -- Returns the cached pinmask used by the library.
+void write8(uint8_t value) -- Set all 8 pins' status at once.
+void write(uint8_t pin, uint8_t value) -- Set a single pin's status.
+void toggle(uint8_t pin) -- Reverses the corresponding pin's status, HIGH to LOW or vice versa.
+void shiftRight(uint8_t n=1) -- Shift the pins' values, with pin 1's value going into pin 2 and so on.
 void shiftLeft(uint8_t n=1)
 int lastError()
 ```
