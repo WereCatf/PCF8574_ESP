@@ -19,6 +19,7 @@ toggle KEYWORD2
 shiftRight KEYWORD2
 shiftLeft KEYWORD2
 lastError KEYWORD2
+resetInterruptPin KEYWORD2
 #######################################
 # Instances (KEYWORD2)
 #######################################

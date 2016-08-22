@@ -28,6 +28,7 @@ class PCF8574
     void toggle(uint8_t pin);
     void shiftRight(uint8_t n=1);
     void shiftLeft(uint8_t n=1);
+    void resetInterruptPin();
 
     int lastError();
 

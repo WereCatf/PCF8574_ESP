@@ -27,6 +27,11 @@ uint8_t PCF8574::read8()
   return _data;
 }
 
+void PCF8574::resetInterruptPin()
+{
+  read8();
+}
+
 uint8_t PCF8574::value()
 {
   return _data;
