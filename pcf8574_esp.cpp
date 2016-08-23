@@ -8,8 +8,21 @@
 // Library modified by WereCatf
 
 #include "pcf8574_esp.h"
+#ifdef ARDUINO_AVR_DIGISPARK
+#include <TinyWireM.h>
+#else
 #include <Wire.h>
+#endif
 
+#ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+PCF8574::PCF8574(uint8_t address)
+{
+  _Wire = TinyWireM;
+  _address = address;
+  _Wire.begin();
+  PCF8574::write8(_pinModeMask);
+}
+#else
 PCF8574::PCF8574(uint8_t address, int sda, int scl, TwoWire UseWire)
 {
   _Wire = UseWire;
@@ -17,6 +30,7 @@ PCF8574::PCF8574(uint8_t address, int sda, int scl, TwoWire UseWire)
   _Wire.begin(sda, scl);
   PCF8574::write8(_pinModeMask);
 }
+#endif
 
 uint8_t PCF8574::read8()
 {

@@ -17,6 +17,7 @@
     Just for the sakes of an example!
     DO NOT FORGET TO WIRE ACCORDINGLY, SDA GOES TO GPIO5, SCL TO GPIO4 (ON NODEMCU GPIO5 IS D1 AND GPIO4 IS D2) */
 TwoWire testWire;
+// Initialize a PCF8574 at I2C-address 0x20, using GPIO5, GPIO4 and testWire for the I2C-bus
 PCF8574 pcf8574(0x20, 5, 4, testWire);
 
 bool PCFInterruptFlag = false;

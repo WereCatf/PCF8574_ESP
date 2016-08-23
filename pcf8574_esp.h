@@ -11,12 +11,20 @@
 #define _PCF8574_ESP_H
 
 #include <Arduino.h>
+#ifdef ARDUINO_AVR_DIGISPARK
+#include <TinyWireM.h>
+#else
 #include <Wire.h>
+#endif
 
 class PCF8574
 {
   public:
+    #ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+    PCF8574(uint8_t address);
+    #else
     PCF8574(uint8_t address, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire);
+    #endif
 
     uint8_t read8();
     uint8_t read(uint8_t pin);
@@ -33,7 +41,11 @@ class PCF8574
     int lastError();
 
   private:
+    #ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+    USI_TWI _Wire;
+    #else
     TwoWire _Wire;
+    #endif
     uint8_t _address;
     uint8_t _data;
     uint8_t _pinModeMask = 255;
