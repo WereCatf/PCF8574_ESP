@@ -22,8 +22,10 @@ class PCF8574
   public:
     #ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
     PCF8574(uint8_t address);
-    #else
+    #elif defined (ESP8266)
     PCF8574(uint8_t address, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire);
+    #else
+    PCF8574(uint8_t address, TwoWire UseWire = Wire);
     #endif
 
     uint8_t read8();

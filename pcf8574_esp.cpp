@@ -8,7 +8,7 @@
 // Library modified by WereCatf
 
 #include "pcf8574_esp.h"
-#ifdef ARDUINO_AVR_DIGISPARK
+#ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
 #include <TinyWireM.h>
 #else
 #include <Wire.h>
@@ -22,13 +22,25 @@ PCF8574::PCF8574(uint8_t address)
   _Wire.begin();
   PCF8574::write8(_pinModeMask);
 }
-#else
+#elif defined (ESP8266)
 PCF8574::PCF8574(uint8_t address, int sda, int scl, TwoWire UseWire)
 {
   _Wire = UseWire;
   _address = address;
   _Wire.begin(sda, scl);
   PCF8574::write8(_pinModeMask);
+}
+#else
+PCF8574::PCF8574(uint8_t address, TwoWire UseWire)
+{
+  _Wire = UseWire;
+  _address = address;
+  _Wire.begin();
+/*  For some reason Arduino Micro (Atmega32u4) crashes if you
+  try to write data over I2C in class-constructor if setup() hasn't ran yet. 
+
+  Commenting this out for now. */
+  //PCF8574::write8(_pinModeMask);
 }
 #endif
 
