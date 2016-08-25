@@ -7,7 +7,11 @@
 #include <pcf8574_esp.h>
 
 //Initialize a PCF8574 at I2C-address 0x20
-PCF8574 pcf8574(0x20);
+PCF857x pcf8574(0x20);
+//PCF857x pcf8574(0x20, false); //This also works
+
+//If you had a PCF8575 you'd use the below format
+//PCF857x pcf8575(0x21, true);
 
 void setup() {
   pcf8574.begin();

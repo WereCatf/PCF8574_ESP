@@ -1,4 +1,4 @@
-/* PCF8574_ESP -- library for using the I2C-driven 8-pin GPIO-expander
+/* PCF857x_ESP -- library for using the I2C-driven 8-pin GPIO-expander
    ORIGINAL AUTHOR: Rob Tillaart
    Library modified by WereCatf */
 
@@ -10,55 +10,67 @@
 #endif
 
 #ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
-PCF8574::PCF8574(uint8_t address)
+PCF857x::PCF857x(uint8_t address, bool is8575)
 {
   _Wire = TinyWireM;
   _address = address;
+  _is8575 = is8575;
 }
 
-void PCF8574::begin(uint8_t defaultValues)
+void PCF857x::begin(uint16_t defaultValues)
 {
   _Wire.begin();
-  PCF8574::write8(defaultValues);
+  if(_is8575) PCF857x::write16(defaultValues);
+  else PCF857x::write8(defaultValues);
 }
 
 #elif defined (ESP8266)
-PCF8574::PCF8574(uint8_t address, int sda, int scl, TwoWire UseWire)
+PCF857x::PCF857x(uint8_t address, bool is8575, int sda, int scl, TwoWire UseWire)
 {
   _Wire = UseWire;
   _address = address;
   _sda = sda;
   _scl = scl;
+  _is8575 = is8575;
 }
 
-void PCF8574::begin(uint8_t defaultValues)
+void PCF857x::begin(uint16_t defaultValues)
 {
   _Wire.begin(_sda, _scl);
-  PCF8574::write8(defaultValues);
+  if(_is8575) PCF857x::write16(defaultValues);
+  else PCF857x::write8(defaultValues);
 }
 
 #else
-PCF8574::PCF8574(uint8_t address, TwoWire UseWire)
+PCF857x::PCF857x(uint8_t address, bool is8575, TwoWire UseWire)
 {
   _Wire = UseWire;
   _address = address;
+  _is8575 = is8575;
 }
 
-void PCF8574::begin(uint8_t defaultValues)
+void PCF857x::begin(uint16_t defaultValues)
 {
   _Wire.begin();
-  PCF8574::write8(defaultValues);
+  if(_is8575) PCF857x::write16(defaultValues);
+  else PCF857x::write8(defaultValues);
 }
 
 #endif
 
-uint8_t PCF8574::read8()
+uint8_t PCF857x::read8()
 {
   _Wire.beginTransmission(_address);
+  if(_is8575)
+  {
+    PCF857x::read16();
+    return (uint8_t) _data;
+  }
+
   if(_Wire.requestFrom(_address, (uint8_t) 1) != 1)
   {
-    _error = PCF8574_I2C_ERROR;
-    return _data;
+    _error = PCF857x_I2C_ERROR;
+    return (uint8_t) _data;
   }
 #if (ARDUINO < 100)
   _data = _Wire.receive();
@@ -69,93 +81,165 @@ uint8_t PCF8574::read8()
   return _data;
 }
 
-void PCF8574::resetInterruptPin()
-{
-  PCF8574::read8();
-}
-
-/*uint8_t PCF8574::value()
-{
-  return _data;
-}*/
-
-void PCF8574::write8(uint8_t value)
+uint16_t PCF857x::read16()
 {
   _Wire.beginTransmission(_address);
-  _data = value;
-  _pinModeMask = _data;
-  _Wire.write(_data);
+  if(!_is8575) return 0x00;
+
+  if(_Wire.requestFrom(_address, (uint8_t) 2) != 1)
+  {
+    _error = PCF857x_I2C_ERROR;
+    return _data;
+  }
+  _data = 0;
+#if (ARDUINO < 100)
+  _data = _Wire.receive();
+  _data |= Wire.receive() << 8;
+#else
+  _data = _Wire.read();
+  _data |= Wire.read() << 8;
+#endif
+  _Wire.endTransmission();
+  return _data;
+}
+
+void PCF857x::resetInterruptPin()
+{
+  if(_is8575) PCF857x::read16();
+  else PCF857x::read8();
+}
+
+void PCF857x::write8(uint8_t value)
+{
+  _Wire.beginTransmission(_address);
+  _pinModeMask &=0xff00;
+  _pinModeMask |= value;
+  _data = _pinModeMask;
+  _Wire.write((uint8_t) _data);
+  if(_is8575) _Wire.write((uint8_t) (_data >> 8));
   _error = _Wire.endTransmission();
 }
 
-uint8_t PCF8574::read(uint8_t pin)
+void PCF857x::write16(uint16_t value)
 {
-  if(pin > 7)
+  if(!_is8575) return;
+  _Wire.beginTransmission(_address);
+  _pinModeMask = value;
+  _data = _pinModeMask;
+  _Wire.write((uint8_t) _data);
+  _Wire.write((uint8_t) (_data >> 8));
+  _error = _Wire.endTransmission();
+}
+
+uint8_t PCF857x::read(uint8_t pin)
+{
+  if(_is8575){
+    if(pin > 15)
     {
-      _error = PCF8574_PIN_ERROR;
+      _error = PCF857x_PIN_ERROR;
       return 0;
+    }
+    PCF857x::read16();
   }
-  PCF8574::read8();
+  else {
+    if(pin > 7)
+    {
+      _error = PCF857x_PIN_ERROR;
+      return 0;
+    }
+    PCF857x::read8();
+  }
   return (_data & (1<<pin)) > 0;
 }
 
-void PCF8574::write(uint8_t pin, uint8_t value)
+void PCF857x::write(uint8_t pin, uint8_t value)
 {
-  if(pin > 7)
+  if(_is8575)
+    if(pin > 15)
     {
-      _error = PCF8574_PIN_ERROR;
+      _error = PCF857x_PIN_ERROR;
       return;
-  }
+    }
+  else if(pin > 7)
+    {
+      _error = PCF857x_PIN_ERROR;
+      return;
+    }
   uint8_t _val = value & 1;
   if(_val) _pinModeMask |= _val << pin;
   else _pinModeMask &= ~(1 << pin);
-  PCF8574::write8(_pinModeMask);
+  if(_is8575) PCF857x::write16(_pinModeMask);
+  else PCF857x::write8(_pinModeMask);
 }
 
-void PCF8574::toggle(uint8_t pin)
+void PCF857x::toggle(uint8_t pin)
 {
-  if(pin > 7)
+  if(_is8575)
+    if(pin > 15)
     {
-      _error = PCF8574_PIN_ERROR;
+      _error = PCF857x_PIN_ERROR;
       return;
-  }
-  _pinModeMask ^=  (1 << pin);
-  PCF8574::write8(_pinModeMask);
+    }
+  else if(pin > 7)
+    {
+      _error = PCF857x_PIN_ERROR;
+      return;
+    }
+  if(_is8575) PCF857x::write16(_pinModeMask);
+  else PCF857x::write8(_pinModeMask);
 }
 
-void PCF8574::toggleAll()
+void PCF857x::toggleAll()
 {
   _pinModeMask = ~_pinModeMask;
-  PCF8574::write8(_pinModeMask);
+  if(_is8575) PCF857x::write16(_pinModeMask);
+  else PCF857x::write8(_pinModeMask);
 }
 
-void PCF8574::shiftRight(uint8_t n)
+void PCF857x::shiftRight(uint8_t n)
 {
-  if (n == 0 || n > 7 ) return;
+  if(_is8575)
+  {
+    if (n == 0 || n > 15 ) return;
+  }
+  else if (n == 0 || n > 7 ) return;
   _pinModeMask >>= n;
-  PCF8574::write8(_pinModeMask);
+  if(_is8575) PCF857x::write16(_pinModeMask);
+  else PCF857x::write8(_pinModeMask);
 }
 
-void PCF8574::shiftLeft(uint8_t n)
+void PCF857x::shiftLeft(uint8_t n)
 {
-  if (n == 0 || n > 7) return;
+  if(_is8575)
+  {
+    if (n == 0 || n > 15 ) return;
+  }
+  else if (n == 0 || n > 7 ) return;
   _pinModeMask <<= n;
-  PCF8574::write8(_pinModeMask);
+  if(_is8575) PCF857x::write16(_pinModeMask);
+  else PCF857x::write8(_pinModeMask);
 }
 
-void PCF8574::rotateRight(uint8_t n)
+void PCF857x::rotateRight(uint8_t n)
 {
-  uint8_t r = n & 7;
-  _pinModeMask = (_pinModeMask >> r) | (_pinModeMask << (8-r));
-  PCF8574::write8(_pinModeMask);
+  if(_is8575){
+    uint8_t r = n & 15;
+    _pinModeMask = (_pinModeMask >> r) | (_pinModeMask << (16-r));
+    PCF857x::write16(_pinModeMask);
+  } else {
+    uint8_t r = n & 7;
+    _pinModeMask = (_pinModeMask >> r) | (_pinModeMask << (8-r));
+    PCF857x::write8(_pinModeMask);
+  }
 }
 
-void PCF8574::rotateLeft(uint8_t n)
+void PCF857x::rotateLeft(uint8_t n)
 {
-  PCF8574::rotateRight(8- (n & 7));
+  if(_is8575) PCF857x::rotateRight(16- (n & 15));
+  else PCF857x::rotateRight(8- (n & 7));
 }
 
-int PCF8574::lastError()
+int PCF857x::lastError()
 {
   int e = _error;
   _error = 0;

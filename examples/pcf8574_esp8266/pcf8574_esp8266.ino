@@ -1,24 +1,28 @@
 /*  Example sketch for the PCF8574 for the purposes of showing how to use the interrupt-pin.
 
-    Attach the positive lead of an LED to PIN7 on the PCF8574 (use a resistor if your LED can't handle 3.3V!),
-    a wire from GPIO2 (Nodemcu D4) to PIN3 so that it alternates the pin between HIGH and LOW once a second,
+    Attach the positive lead of an LED to PIN7 on the PCF8574 and the negative lead to GND,
+    a wire from GPIO2 (Nodemcu D4) to PIN3 that will be used to trigger the interrupt,
     and the INT-pin to GPIO14 (Nodemcu D5) on the ESP8266.
 
-    If all goes well you should see the small blue LED on the ESP-module lighting up and the LED connected to
-    the PCF going off, and vice versa. */
+    If all goes well you should see the small blue LED on the ESP-module lighting up and the
+    LED connected to the PCF going off, and vice versa. */
 
 #include <pcf8574_esp.h>
 #include <ESP8266WiFi.h>
 
-/*  Wire.h already defines "Wire" which the PCF8574-class would use by default, but for the sakes of an example let's define our
-    own instance of it and use that instead!
+/*  Wire.h already defines "Wire" which the PCF8574-class would use by default,
+    but for the sakes of an example let's define our own instance of it and use that instead!
 
-    Also, since I2C is emulated on the ESP8266 let's redefine what pins to use as SDA and SCL and instead swap them around!
-    Just for the sakes of an example!
+    Also, since I2C is emulated on the ESP8266 let's redefine what pins to use as SDA and SCL
+    and instead swap them around!
     DO NOT FORGET TO WIRE ACCORDINGLY, SDA GOES TO GPIO5, SCL TO GPIO4 (ON NODEMCU GPIO5 IS D1 AND GPIO4 IS D2) */
 TwoWire testWire;
 // Initialize a PCF8574 at I2C-address 0x20, using GPIO5, GPIO4 and testWire for the I2C-bus
-PCF8574 pcf8574(0x20, 5, 4, testWire);
+PCF857x pcf8574(0x20, 5, 4, testWire);
+//PCF857x pcf8574(0x20, false); //This also works
+
+//If you had a PCF8575 instead you'd use the below format
+//PCF857x pcf8575(0x20, true);
 
 bool PCFInterruptFlag = false;
 
@@ -51,7 +55,7 @@ void loop() {
     else Serial.println("Pin 3 is LOW!");
     // DO NOTE: When you write LOW to a pin on a PCF8574 it becomes an OUTPUT.
     // It wouldn't generate an interrupt if you were to connect a button to it that pulls it HIGH when you press the button.
-    // Any pin you wish to use as input must be written HIGH, or, like it says, all the pins already default to HIGH at boot.
+    // Any pin you wish to use as input must be written HIGH and be pulled LOW to generate an interrupt.
     pcf8574.write(7, pcf8574.read(3));
     PCFInterruptFlag=false;
   }
