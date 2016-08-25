@@ -1,22 +1,27 @@
 # PCF8574_ESP
 
-This is a simple library for using the PCF8574/PCF8574A I/O - expanders over I2C. I took the code by Rob Tillaart from http://playground.arduino.cc/Main/PCF8574Class and modified it to allow the use of I2C on non-default pins and/or using a TwoWire - class of your own instead of the default "Wire" as defined in Wire.h.
+This is a simple library for using the PCF8574/PCF8574A I/O - expanders over I2C. I took the code by Rob Tillaart from http://playground.arduino.cc/Main/PCF8574Class and modified it. Rob's original code is designed to work only with the first I2C-bus,
+but many devices now have multiple I2C-buses and on the ESP8266 the I2C is software-based, so you can have as many buses as
+you have free I/O-pins for and you can use whatever free pin you like for it, so there's the motivation for this modification.
 
-This library does not supply any special handling for using the interrupt - pin on the PCF8574, just connect the pin to a pin on your ESP, set up an interrupt-handler for it and remember to use pinMode(pin, INPUT_PULLUP) to make use of it.
+This library does not supply any special functionality for using the interrupt-pin on the PCF8574, you have to do that part
+yourself. Don't forget to configure the pin on the MCU's end as INPUT_PULLUP!
 
-Despite the library's name, it supports the ESP8266 and Attiny85 (need to install TinyWireM) at the moment.
+Despite the library's name, it supports the ESP8266, Attiny85 and should work with any standard Arduino-device at the moment, though I have only tested it with Arduino Micro so far.
 
 # Usage
 ```
 class initializer PCF8574(uint8_t address, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire)
 uint8_t read8() -- Read all 8 pins' status at once as a bitmask with a pin being HIGH if the corresponding bit is set, and vice versa.
 uint8_t read(uint8_t pin) -- Returns a single pin's status.
-uint8_t value() -- Returns the cached pinmask used by the library.
 void write8(uint8_t value) -- Set all 8 pins' status at once.
 void write(uint8_t pin, uint8_t value) -- Set a single pin's status.
 void toggle(uint8_t pin) -- Reverses the corresponding pin's status, HIGH to LOW or vice versa.
-void shiftRight(uint8_t n=1) -- Shift the pins' values, with pin 1's value going into pin 2 and so on.
-void shiftLeft(uint8_t n=1)
+void toggleAll() -- Reverses all the pins' statuses, from HIGH to LOW and vice versa.
+void shiftLeft(uint8_t n=1) -- Shift the pins' states left, with pin 1's state going into pin 2 and so on.
+void shiftRight(uint8_t n=1) -- Like above, but to the right instead.
+void rotateLeft(uint8_t n=1) -- Rotate the pins' status instead of just shifting them, with pin 7's status going to pin 0, ie. wrapping around.
+void rotateRight(uint8_t n=1) -- Like above.
 int lastError()
 ```
 

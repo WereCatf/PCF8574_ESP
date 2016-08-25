@@ -43,8 +43,8 @@ class PCF8574
     void toggleAll();
     void shiftRight(uint8_t n=1);
     void shiftLeft(uint8_t n=1);
-    void rotateRight(uint8_t n);
-    void rotateLeft(uint8_t n);
+    void rotateRight(uint8_t n=1);
+    void rotateLeft(uint8_t n=1);
     void resetInterruptPin();
 
     int lastError();
