@@ -37,13 +37,11 @@ void setup() {
   Serial.begin(115200);
   pinMode(2, OUTPUT);
 
+  pcf8574.begin();
   // Most ready-made PCF8574-modules seem to lack an internal pullup-resistor, so you have to use the ESP8266-internal one.
   pinMode(14, INPUT_PULLUP);
   pcf8574.resetInterruptPin();
   attachInterrupt(digitalPinToInterrupt(14), PCFInterrupt, FALLING);
-
-  // Do notice that we aren't initializing the pins on the PCF8574, because they default to INPUT, ie. HIGH, after reset.
-  // Initialization is therefore not needed.
 }
 
 void loop() {

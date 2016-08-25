@@ -16,10 +16,13 @@ value KEYWORD2
 write8 KEYWORD2
 write KEYWORD2
 toggle KEYWORD2
+toggleAll KEYWORD2
 shiftRight KEYWORD2
 shiftLeft KEYWORD2
 lastError KEYWORD2
 resetInterruptPin KEYWORD2
+rotateLeft KEYWORD2
+rotateRight KEYWORD2
 #######################################
 # Instances (KEYWORD2)
 #######################################
