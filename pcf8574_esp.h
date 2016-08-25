@@ -13,6 +13,8 @@
 
 #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
 #include <TinyWireM.h>
+#elif defined (__STM32F1__)
+#include <HardWire.h>
 #else
 #include <Wire.h>
 #endif
@@ -27,6 +29,11 @@ class PCF857x
     // Defaults to 8574, set is8575 to true if you have a 8575 instead.
     #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
     PCF857x(uint8_t address, bool is8575 = false);
+    #elif defined (__STM32F1__)
+    PCF857x(uint8_t address, bool is8575 = false, int busNumber = 1) : _Wire(busNumber){
+      _address = address;
+      _is8575 = is8575;
+    }
     #elif defined (ESP8266)
     PCF857x(uint8_t address, bool is8575 = false, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire);
     #else
@@ -55,6 +62,8 @@ class PCF857x
   private:
     #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
     USI_TWI _Wire;
+    #elif defined (__STM32F1__)
+    HardWire _Wire;
     #else
     TwoWire _Wire;
     #endif
