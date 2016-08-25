@@ -11,7 +11,7 @@
 #include <WProgram.h>
 #endif
 
-#ifdef ARDUINO_AVR_DIGISPARK
+#if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
 #include <TinyWireM.h>
 #else
 #include <Wire.h>
@@ -25,7 +25,7 @@ class PCF857x
 {
   public:
     // Defaults to 8574, set is8575 to true if you have a 8575 instead.
-    #ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+    #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
     PCF857x(uint8_t address, bool is8575 = false);
     #elif defined (ESP8266)
     PCF857x(uint8_t address, bool is8575 = false, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire);
@@ -53,7 +53,7 @@ class PCF857x
     int lastError();
 
   private:
-    #ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+    #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
     USI_TWI _Wire;
     #else
     TwoWire _Wire;

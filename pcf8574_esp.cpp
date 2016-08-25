@@ -3,13 +3,13 @@
    Library modified by WereCatf */
 
 #include "pcf8574_esp.h"
-#ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+#if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
 #include <TinyWireM.h>
 #else
 #include <Wire.h>
 #endif
 
-#ifdef ARDUINO_AVR_DIGISPARK || ARDUINO_AVR_ATTINYX5
+#if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
 PCF857x::PCF857x(uint8_t address, bool is8575)
 {
   _Wire = TinyWireM;
