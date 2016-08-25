@@ -4,13 +4,14 @@ This is a simple library for using the PCF8574/PCF8574A/PCF8575 I/O-expanders ov
 
 This library does not supply any special functionality for using the interrupt-pin on the PCF8574/PCF8575, you have to do that part yourself. Don't forget to configure the pin on the MCU's end as INPUT_PULLUP!
 
-Despite the library's name, it supports the ESP8266, Attiny85 and should work with any standard Arduino-device at the moment, though, out of the official Arduino-boards I have only tested it with Arduino Micro as I don't yet own any other ones.
+Despite the library's name, it supports the ESP8266, Attiny85, STM32F1 and should work with any standard Arduino-device at the moment, though, out of the official Arduino-boards, I have only tested it with Arduino Micro as I don't yet own any other ones.
 
 # Usage
 ```
 What arguments the class-constructor accepts depends on the board you use:
 ESP8266: PCF857x(uint8_t address, is8575 = false, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire)
 Attiny85: PCF857x(uint8_t address, is8575 = false)
+STM32F1: PCF857x(uint8_t address, is8575 = false, int busNumber = 1)
 All others: PCF857x(uint8_t address, is8575 = false, TwoWire UseWire = Wire)
 
 uint8_t read8() -- Read all 8 pins' status at once as a bitmask with a pin being HIGH if the corresponding bit is set, and vice versa.
