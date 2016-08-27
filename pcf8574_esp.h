@@ -30,14 +30,9 @@ class PCF857x
     #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
     PCF857x(uint8_t address, bool is8575 = false);
     #elif defined (__STM32F1__)
-    PCF857x(uint8_t address, bool is8575 = false, int busNumber = 1) : _Wire(busNumber){
-      _address = address;
-      _is8575 = is8575;
-    }
-    #elif defined (ESP8266)
-    PCF857x(uint8_t address, bool is8575 = false, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire);
+    PCF857x(uint8_t address, HardWire *Wire, bool is8575 = false);
     #else
-    PCF857x(uint8_t address, bool is8575 = false, TwoWire UseWire = Wire);
+    PCF857x(uint8_t address, TwoWire *UseWire, bool is8575 = false);
     #endif
 
     void begin(uint16_t defaultValues=0xffff);
@@ -61,21 +56,17 @@ class PCF857x
 
   private:
     #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
-    USI_TWI _Wire;
+    USI_TWI *_Wire;
     #elif defined (__STM32F1__)
-    HardWire _Wire;
+    HardWire *_Wire;
     #else
-    TwoWire _Wire;
+    TwoWire *_Wire;
     #endif
     uint8_t _address;
     uint16_t _data;
     uint16_t _pinModeMask;
     int _error;
     bool _is8575;
-    #if defined (ESP8266)
-    int _sda;
-    int _scl;
-    #endif
 };
 
 #endif

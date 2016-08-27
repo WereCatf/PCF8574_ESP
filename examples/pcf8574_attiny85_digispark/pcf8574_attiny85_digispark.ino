@@ -5,15 +5,17 @@
     You must install TinyWireM-library (https://github.com/SpenceKonde/TinyWireM) for I2C on Attiny */
 
 #include <pcf8574_esp.h>
+#include <TinyWireM.h>
 
 //Initialize a PCF8574 at I2C-address 0x20
 PCF857x pcf8574(0x20);
 //PCF857x pcf8574(0x20, false); //This also works
 
 //If you had a PCF8575 you'd use the below format
-//PCF857x pcf8575(0x21, true);
+//PCF857x pcf8575(0x20, true);
 
 void setup() {
+  TinyWireM.begin();
   pcf8574.begin();
 }
 

@@ -9,6 +9,7 @@
 
 #include <pcf8574_esp.h>
 #include <ESP8266WiFi.h>
+#include <Wire.h>
 
 /*  Wire.h already defines "Wire" which the PCF8574-class would use by default,
     but for the sakes of an example let's define our own instance of it and use that instead!
@@ -18,10 +19,10 @@
     DO NOT FORGET TO WIRE ACCORDINGLY, SDA GOES TO GPIO5, SCL TO GPIO4 (ON NODEMCU GPIO5 IS D1 AND GPIO4 IS D2) */
 TwoWire testWire;
 // Initialize a PCF8574 at I2C-address 0x20, using GPIO5, GPIO4 and testWire for the I2C-bus
-PCF857x pcf8574(0x20, false, 5, 4, testWire);
+PCF857x pcf8574(0x20, &testWire);
 
 //If you had a PCF8575 instead you'd use the below format
-//PCF857x pcf8575(0x20, true, 5, 4, testWire);
+//PCF857x pcf8575(0x20, &testWire, true);
 
 bool PCFInterruptFlag = false;
 
@@ -38,8 +39,10 @@ void setup() {
   // Remove them if you want to modify the sketch and use WiFi.
 
   Serial.begin(115200);
+  Serial.println("Firing up...");
   pinMode(2, OUTPUT);
 
+  testWire.begin(5, 4);
   pcf8574.begin();
   // Most ready-made PCF8574-modules seem to lack an internal pullup-resistor, so you have to use the ESP8266-internal one.
   pinMode(14, INPUT_PULLUP);
@@ -58,7 +61,8 @@ void loop() {
     pcf8574.write(7, pcf8574.read(3));
     PCFInterruptFlag=false;
   }
-  delay(1000);
+  Serial.println("Blink.");
   if(digitalRead(2)==HIGH) digitalWrite(2, LOW);
   else digitalWrite(2, HIGH);
+  delay(1000);
 }

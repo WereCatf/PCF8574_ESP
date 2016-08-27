@@ -14,52 +14,33 @@
 #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
 PCF857x::PCF857x(uint8_t address, bool is8575)
 {
-  _Wire = TinyWireM;
+  _Wire = &TinyWireM;
   _address = address;
   _is8575 = is8575;
 }
 
 void PCF857x::begin(uint16_t defaultValues)
 {
-  _Wire.begin();
   if(_is8575) PCF857x::write16(defaultValues);
   else PCF857x::write8(defaultValues);
 }
 
 #elif defined (__STM32F1__)
-/*PCF857x::PCF857x(uint8_t address, bool is8575, int busNumber)
+PCF857x::PCF857x(uint8_t address, HardWire *Wire, bool is8575)
 {
-  _Wire.HardWire(busNumber);
+  _Wire = Wire;
   _address = address;
-  _is8575 = is8575;
-}*/
-
-void PCF857x::begin(uint16_t defaultValues)
-{
-  _Wire.begin();
-  if(_is8575) PCF857x::write16(defaultValues);
-  else PCF857x::write8(defaultValues);
-}
-
-#elif defined (ESP8266)
-PCF857x::PCF857x(uint8_t address, bool is8575, int sda, int scl, TwoWire UseWire)
-{
-  _Wire = UseWire;
-  _address = address;
-  _sda = sda;
-  _scl = scl;
   _is8575 = is8575;
 }
 
 void PCF857x::begin(uint16_t defaultValues)
 {
-  _Wire.begin(_sda, _scl);
   if(_is8575) PCF857x::write16(defaultValues);
   else PCF857x::write8(defaultValues);
 }
 
 #else
-PCF857x::PCF857x(uint8_t address, bool is8575, TwoWire UseWire)
+PCF857x::PCF857x(uint8_t address, TwoWire *UseWire, bool is8575)
 {
   _Wire = UseWire;
   _address = address;
@@ -68,7 +49,6 @@ PCF857x::PCF857x(uint8_t address, bool is8575, TwoWire UseWire)
 
 void PCF857x::begin(uint16_t defaultValues)
 {
-  _Wire.begin();
   if(_is8575) PCF857x::write16(defaultValues);
   else PCF857x::write8(defaultValues);
 }
@@ -77,46 +57,46 @@ void PCF857x::begin(uint16_t defaultValues)
 
 uint8_t PCF857x::read8()
 {
-  _Wire.beginTransmission(_address);
+  _Wire->beginTransmission(_address);
   if(_is8575)
   {
     PCF857x::read16();
     return (uint8_t) _data;
   }
 
-  if(_Wire.requestFrom(_address, (uint8_t) 1) != 1)
+  if(_Wire->requestFrom(_address, (uint8_t) 1) != 1)
   {
     _error = PCF857x_I2C_ERROR;
     return (uint8_t) _data;
   }
 #if (ARDUINO < 100)
-  _data = _Wire.receive();
+  _data = _Wire->receive();
 #else
-  _data = _Wire.read();
+  _data = _Wire->read();
 #endif
-  _Wire.endTransmission();
+  _Wire->endTransmission();
   return _data;
 }
 
 uint16_t PCF857x::read16()
 {
-  _Wire.beginTransmission(_address);
+  _Wire->beginTransmission(_address);
   if(!_is8575) return 0x00;
 
-  if(_Wire.requestFrom(_address, (uint8_t) 2) != 1)
+  if(_Wire->requestFrom(_address, (uint8_t) 2) != 1)
   {
     _error = PCF857x_I2C_ERROR;
     return _data;
   }
   _data = 0;
 #if (ARDUINO < 100)
-  _data = _Wire.receive();
-  _data |= _Wire.receive() << 8;
+  _data = _Wire->receive();
+  _data |= _Wire->receive() << 8;
 #else
-  _data = _Wire.read();
-  _data |= _Wire.read() << 8;
+  _data = _Wire->read();
+  _data |= _Wire->read() << 8;
 #endif
-  _Wire.endTransmission();
+  _Wire->endTransmission();
   return _data;
 }
 
@@ -128,24 +108,24 @@ void PCF857x::resetInterruptPin()
 
 void PCF857x::write8(uint8_t value)
 {
-  _Wire.beginTransmission(_address);
+  _Wire->beginTransmission(_address);
   _pinModeMask &=0xff00;
   _pinModeMask |= value;
   _data = _pinModeMask;
-  _Wire.write((uint8_t) _data);
-  if(_is8575) _Wire.write((uint8_t) (_data >> 8));
-  _error = _Wire.endTransmission();
+  _Wire->write((uint8_t) _data);
+  if(_is8575) _Wire->write((uint8_t) (_data >> 8));
+  _error = _Wire->endTransmission();
 }
 
 void PCF857x::write16(uint16_t value)
 {
   if(!_is8575) return;
-  _Wire.beginTransmission(_address);
+  _Wire->beginTransmission(_address);
   _pinModeMask = value;
   _data = _pinModeMask;
-  _Wire.write((uint8_t) _data);
-  _Wire.write((uint8_t) (_data >> 8));
-  _error = _Wire.endTransmission();
+  _Wire->write((uint8_t) _data);
+  _Wire->write((uint8_t) (_data >> 8));
+  _error = _Wire->endTransmission();
 }
 
 uint8_t PCF857x::read(uint8_t pin)
