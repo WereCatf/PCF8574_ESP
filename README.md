@@ -2,18 +2,18 @@
 
 This is a simple library for using the PCF8574/PCF8574A/PCF8575 I/O-expanders over I2C. I took the code by Rob Tillaart from http://playground.arduino.cc/Main/PCF8574Class and modified it. Rob's original code is designed to work only with the first I2C-bus, but many devices now have multiple I2C-buses and on the ESP8266 the I2C is software-based, so you can have as many buses as you have free I/O-pins for and you can use whatever free pin you like for it. I also added support for the PCF8575 16-pin I/O-expander.
 
-This library does not supply any special functionality for using the interrupt-pin on the PCF8574/PCF8575, you have to do that part yourself. Don't forget to configure the pin on the MCU's end as INPUT_PULLUP!
+This library does not supply any special functionality for using the interrupt-pin on the PCF8574/PCF8575, you have to do that part yourself. Don't forget to configure the pin on the MCU's end as INPUT_PULLUP! You also have to set up the I2C-bus yourself before calling any library-functions.
 
 Despite the library's name, it supports the ESP8266, Attiny85, STM32F1 and should work with any standard Arduino-device at the moment, though, out of the official Arduino-boards, I have only tested it with Arduino Micro as I don't yet own any other ones.
 
 # Usage
 ```
 What arguments the class-constructor accepts depends on the board you use:
-ESP8266: PCF857x(uint8_t address, is8575 = false, int sda = SDA, int scl = SCL, TwoWire UseWire = Wire)
 Attiny85: PCF857x(uint8_t address, is8575 = false)
-STM32F1: PCF857x(uint8_t address, is8575 = false, int busNumber = 1)
-All others: PCF857x(uint8_t address, is8575 = false, TwoWire UseWire = Wire)
+STM32F1: PCF857x(uint8_t address, HardWire *Wire, is8575 = false)
+ESP8266 and others: PCF857x(uint8_t address, TwoWire *UseWire, is8575 = false)
 
+void begin()
 uint8_t read8() -- Read all 8 pins' status at once as a bitmask with a pin being HIGH if the corresponding bit is set, and vice versa.
 uint8_t read(uint8_t pin) -- Returns a single pin's status.
 void write8(uint8_t value) -- Set all 8 pins' status at once.
