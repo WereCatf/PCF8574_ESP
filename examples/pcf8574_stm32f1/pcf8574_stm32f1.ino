@@ -11,12 +11,14 @@
 
 /*  We need to set up the I2C-bus for the library to use */
 #include <HardWire.h>
-/* Use I2C-bus 1 */
-HardWire HWire(1, I2C_FAST_MODE | I2C_BUS_RESET);
+/*  Use I2C-bus 1
+    Specsheets say PCF8574 is officially rated only for 100KHz I2C-bus */
+HardWire HWire(1, I2C_BUS_RESET);
+/*  PCF8575 is rated for 400KHz
+HardWire HWire(1, I2C_FAST_MODE | I2C_BUS_RESET); */
 
 // Initialize a PCF8574 at I2C-address 0x20, using GPIO5, GPIO4 and testWire for the I2C-bus
 PCF857x pcf8574(0x20, &HWire);
-
 //If you had a PCF8575 instead you'd use the below format
 //PCF857x pcf8575(0x20, &Hwire, true);
 

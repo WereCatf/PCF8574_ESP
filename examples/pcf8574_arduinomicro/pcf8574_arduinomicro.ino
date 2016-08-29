@@ -31,8 +31,9 @@ void setup() {
   pinMode(13, OUTPUT);
 
   Wire.begin();
-  //Set to 400KHz
-  Wire.setClock(400000L);
+  //Specsheets say PCF8574 is officially rated only for 100KHz I2C-bus
+  //PCF8575 is rated for 400KHz
+  Wire.setClock(100000L);
   pcf8574.begin();
   // Most ready-made PCF8574-modules seem to lack an internal pullup-resistor, so you have to use the MCU-internal one.
   pinMode(7, INPUT_PULLUP);

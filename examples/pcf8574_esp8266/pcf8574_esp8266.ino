@@ -43,6 +43,9 @@ void setup() {
   pinMode(2, OUTPUT);
 
   testWire.begin(5, 4);
+  //Specsheets say PCF8574 is officially rated only for 100KHz I2C-bus
+  //PCF8575 is rated for 400KHz
+  testWire.setClock(100000L);
   pcf8574.begin();
   // Most ready-made PCF8574-modules seem to lack an internal pullup-resistor, so you have to use the ESP8266-internal one.
   pinMode(14, INPUT_PULLUP);
