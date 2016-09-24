@@ -130,7 +130,8 @@ void PCF857x::write16(uint16_t value)
 
 uint8_t PCF857x::read(uint8_t pin)
 {
-  if(_is8575){
+  if(_is8575)
+  {
     if(pin > 15)
     {
       _error = PCF857x_PIN_ERROR;
@@ -138,7 +139,8 @@ uint8_t PCF857x::read(uint8_t pin)
     }
     PCF857x::read16();
   }
-  else {
+  else
+  {
     if(pin > 7)
     {
       _error = PCF857x_PIN_ERROR;
@@ -152,16 +154,18 @@ uint8_t PCF857x::read(uint8_t pin)
 void PCF857x::write(uint8_t pin, uint8_t value)
 {
   if(_is8575)
+  {
     if(pin > 15)
     {
       _error = PCF857x_PIN_ERROR;
       return;
     }
+  }
   else if(pin > 7)
-    {
-      _error = PCF857x_PIN_ERROR;
-      return;
-    }
+  {
+    _error = PCF857x_PIN_ERROR;
+    return;
+  }
   uint8_t _val = value & 1;
   if(_val) _pinModeMask |= _val << pin;
   else _pinModeMask &= ~(1 << pin);
@@ -172,16 +176,18 @@ void PCF857x::write(uint8_t pin, uint8_t value)
 void PCF857x::toggle(uint8_t pin)
 {
   if(_is8575)
+  {
     if(pin > 15)
     {
       _error = PCF857x_PIN_ERROR;
       return;
     }
+  }
   else if(pin > 7)
-    {
-      _error = PCF857x_PIN_ERROR;
-      return;
-    }
+  {
+    _error = PCF857x_PIN_ERROR;
+    return;
+  }
   if(_is8575) PCF857x::write16(_pinModeMask);
   else PCF857x::write8(_pinModeMask);
 }
