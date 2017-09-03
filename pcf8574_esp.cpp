@@ -188,6 +188,7 @@ void PCF857x::toggle(uint8_t pin)
     _error = PCF857x_PIN_ERROR;
     return;
   }
+  _pinModeMask ^= 1 << pin;
   if(_is8575) PCF857x::write16(_pinModeMask);
   else PCF857x::write8(_pinModeMask);
 }
