@@ -83,7 +83,7 @@ uint16_t PCF857x::read16()
   _Wire->beginTransmission(_address);
   if(!_is8575) return 0x00;
 
-  if(_Wire->requestFrom(_address, (uint8_t) 2) != 1)
+  if(_Wire->requestFrom(_address, (uint8_t) 2) != 2)
   {
     _error = PCF857x_I2C_ERROR;
     return _data;
