@@ -54,6 +54,11 @@ class PCF857x
 
     int lastError();
 
+  protected:
+    uint16_t _data;
+    uint16_t _pinModeMask;
+    bool _is8575;
+
   private:
     #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
     USI_TWI *_Wire;
@@ -63,10 +68,7 @@ class PCF857x
     TwoWire *_Wire;
     #endif
     uint8_t _address;
-    uint16_t _data;
-    uint16_t _pinModeMask;
     int _error;
-    bool _is8575;
 };
 
 #endif
