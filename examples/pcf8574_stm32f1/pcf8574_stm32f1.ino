@@ -22,7 +22,7 @@ PCF857x pcf8574(0x20, &HWire);
 //If you had a PCF8575 instead you'd use the below format
 //PCF857x pcf8575(0x20, &Hwire, true);
 
-bool PCFInterruptFlag = false;
+volatile bool PCFInterruptFlag = false;
 
 void PCFInterrupt() {
   PCFInterruptFlag = true;
