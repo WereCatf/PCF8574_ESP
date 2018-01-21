@@ -57,14 +57,14 @@ void PCF857x::begin(uint16_t defaultValues)
 
 uint8_t PCF857x::read8()
 {
-  _Wire->beginTransmission(_address);
   if(_is8575)
   {
     PCF857x::read16();
     return (uint8_t) _data;
   }
 
-  if(_Wire->requestFrom(_address, (uint8_t) 1) != 1)
+  _Wire->requestFrom(_address, (uint8_t) 1);
+  if(_Wire->available() < 1)
   {
     _error = PCF857x_I2C_ERROR;
     return (uint8_t) _data;
@@ -74,16 +74,18 @@ uint8_t PCF857x::read8()
 #else
   _data = _Wire->read();
 #endif
-  _Wire->endTransmission();
   return _data;
 }
 
 uint16_t PCF857x::read16()
 {
-  _Wire->beginTransmission(_address);
-  if(!_is8575) return 0x00;
+  if(!_is8575){
+    PCF857x::read8();
+    return (uint16_t) _data;
+  }
 
-  if(_Wire->requestFrom(_address, (uint8_t) 2) != 2)
+  _Wire->requestFrom(_address, (uint8_t) 2);
+  if(_Wire->available() < 2)
   {
     _error = PCF857x_I2C_ERROR;
     return _data;
@@ -96,7 +98,6 @@ uint16_t PCF857x::read16()
   _data = _Wire->read();
   _data |= _Wire->read() << 8;
 #endif
-  _Wire->endTransmission();
   return _data;
 }
 

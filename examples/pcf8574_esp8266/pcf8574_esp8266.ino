@@ -20,6 +20,7 @@
 TwoWire testWire;
 // Initialize a PCF8574 at I2C-address 0x20, using GPIO5, GPIO4 and testWire for the I2C-bus
 PCF857x pcf8574(0x20, &testWire);
+// Use PCF857x pcf8574(0x20, &Wire); if you don't wish to define your own Wire-instance.
 
 //If you had a PCF8575 instead you'd use the below format
 //PCF857x pcf8575(0x20, &testWire, true);
