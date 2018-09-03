@@ -4,6 +4,11 @@ This is a simple library for using the PCF8574/PCF8574A/PCF8575 I/O-expanders ov
 
 This library does not supply any special functionality for using the interrupt-pin on the PCF8574/PCF8575, you have to do that part yourself. Don't forget to configure the pin on the MCU's end as INPUT_PULLUP! You also have to set up the I2C-bus yourself before calling any library-functions.
 
+The library also doesn't supply any pinMode()-function for a reason: it'd be confusing. The 
+PCF857x-devices only support two pin-modes, namely INPUT HIGH and OUTPUT LOW -- no INPUT LOW 
+or OUTPUT HIGH or anything fancier than that. Use the write()-function instead and remember 
+that there are only those two modes.
+
 Despite the library's name, it supports the ESP8266, Attiny85, STM32F1 and should work with any standard Arduino-device at the moment, though, out of the official Arduino-boards, I have only tested it with Arduino Micro as I don't yet own any other ones.
 
 # Usage
