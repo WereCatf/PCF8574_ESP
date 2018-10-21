@@ -5,8 +5,6 @@
 #include "pcf8574_esp.h"
 #if defined (ARDUINO_AVR_DIGISPARK) || defined (ARDUINO_AVR_ATTINYX5)
 #include <TinyWireM.h>
-#elif defined (__STM32F1__)
-#include <HardWire.h>
 #else
 #include <Wire.h>
 #endif
@@ -15,20 +13,6 @@
 PCF857x::PCF857x(uint8_t address, bool is8575)
 {
   _Wire = &TinyWireM;
-  _address = address;
-  _is8575 = is8575;
-}
-
-void PCF857x::begin(uint16_t defaultValues)
-{
-  if(_is8575) PCF857x::write16(defaultValues);
-  else PCF857x::write8(defaultValues);
-}
-
-#elif defined (__STM32F1__)
-PCF857x::PCF857x(uint8_t address, HardWire *Wire, bool is8575)
-{
-  _Wire = Wire;
   _address = address;
   _is8575 = is8575;
 }
